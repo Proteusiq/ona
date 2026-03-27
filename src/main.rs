@@ -222,3 +222,127 @@ fn html_escape(s: &str) -> String {
         .replace('"', "&quot;")
         .replace('\'', "&#39;")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_html_escape_special_characters() {
+        let input = "<script>alert('xss')</script>";
+        let expected = "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;";
+
+        let result = html_escape(input);
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_html_escape_ampersand() {
+        let input = "foo & bar";
+        let expected = "foo &amp; bar";
+
+        let result = html_escape(input);
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_html_escape_quotes() {
+        let input = r#"He said "hello""#;
+        let expected = "He said &quot;hello&quot;";
+
+        let result = html_escape(input);
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_render_markdown_basic() {
+        let markdown = "# Hello\n\nThis is **bold** text.";
+
+        let result = render_markdown(markdown).unwrap();
+
+        assert!(result.contains("<h1>Hello</h1>"));
+        assert!(result.contains("<strong>bold</strong>"));
+    }
+
+    #[test]
+    fn test_render_markdown_code_block() {
+        let markdown = "```rust\nfn main() {}\n```";
+
+        let result = render_markdown(markdown).unwrap();
+
+        assert!(result.contains("code-block"));
+        assert!(result.contains("code-lang"));
+        assert!(result.contains("rust"));
+    }
+
+    #[test]
+    fn test_render_markdown_table() {
+        let markdown = "| A | B |\n|---|---|\n| 1 | 2 |";
+
+        let result = render_markdown(markdown).unwrap();
+
+        assert!(result.contains("<table>"));
+        assert!(result.contains("<th>"));
+        assert!(result.contains("<td>"));
+    }
+
+    #[test]
+    fn test_render_markdown_task_list() {
+        let markdown = "- [x] Done\n- [ ] Todo";
+
+        let result = render_markdown(markdown).unwrap();
+
+        assert!(result.contains("checkbox"));
+        assert!(result.contains("checked"));
+    }
+
+    #[test]
+    fn test_render_markdown_links() {
+        let markdown = "[GitHub](https://github.com)";
+
+        let result = render_markdown(markdown).unwrap();
+
+        assert!(result.contains("<a href=\"https://github.com\">GitHub</a>"));
+    }
+
+    #[test]
+    fn test_template_generates_valid_html() {
+        let content = "<p>Hello</p>";
+        let title = "Test";
+        let theme = "auto";
+
+        let result = template::generate_html(content, title, theme);
+
+        assert!(result.contains("<!DOCTYPE html>"));
+        assert!(result.contains("<title>Test</title>"));
+        assert!(result.contains("<p>Hello</p>"));
+        assert!(result.contains("theme-toggle"));
+    }
+
+    #[test]
+    fn test_template_light_theme() {
+        let result = template::generate_html("<p>Test</p>", "Test", "light");
+
+        assert!(result.contains(r#"class="light""#));
+        assert!(result.contains(r#"data-theme="light""#));
+    }
+
+    #[test]
+    fn test_template_dark_theme() {
+        let result = template::generate_html("<p>Test</p>", "Test", "dark");
+
+        assert!(result.contains(r#"class="dark""#));
+        assert!(result.contains(r#"data-theme="dark""#));
+    }
+
+    #[test]
+    fn test_template_auto_theme() {
+        let result = template::generate_html("<p>Test</p>", "Test", "auto");
+
+        assert!(result.contains(r#"class="""#));
+        assert!(result.contains(r#"data-theme="auto""#));
+    }
+}
