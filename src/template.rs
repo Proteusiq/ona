@@ -916,6 +916,110 @@ body {
     background-color: var(--color-link);
     color: white;
 }
+
+/* Exit Dialog */
+#exitDialog {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+}
+
+#exitDialog.visible {
+    display: block;
+}
+
+.exit-dialog-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.15s ease-out;
+}
+
+.exit-dialog-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.2s ease-out;
+}
+
+.exit-dialog-content h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.25em;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.exit-dialog-content p {
+    margin: 0 0 24px 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.exit-dialog-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.exit-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.exit-btn-delete {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.exit-btn-delete:hover {
+    background: var(--color-bg-secondary);
+    color: var(--color-text);
+}
+
+.exit-btn-save {
+    background: #238636;
+    border: 1px solid #238636;
+    color: white;
+}
+
+.exit-btn-save:hover {
+    background: #2ea043;
+    border-color: #2ea043;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
 "##;
 
 const JS: &str = r##"
@@ -924,32 +1028,32 @@ let documentSaved = false;
 const documentTitle = document.title || 'document';
 
 // Save functionality
+function saveDocument() {
+    const saveBtn = document.getElementById('saveBtn');
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob(['<!DOCTYPE html>\n' + html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = documentTitle + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Mark as saved
+    documentSaved = true;
+    saveBtn.classList.add('saved');
+    saveBtn.querySelector('span').textContent = 'Saved';
+    
+    setTimeout(() => {
+        saveBtn.classList.remove('saved');
+        saveBtn.querySelector('span').textContent = 'Save';
+    }, 2000);
+}
+
 (function() {
     const saveBtn = document.getElementById('saveBtn');
-    
-    function saveDocument() {
-        const html = document.documentElement.outerHTML;
-        const blob = new Blob(['<!DOCTYPE html>\n' + html], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = documentTitle + '.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // Mark as saved
-        documentSaved = true;
-        saveBtn.classList.add('saved');
-        saveBtn.querySelector('span').textContent = 'Saved';
-        
-        setTimeout(() => {
-            saveBtn.classList.remove('saved');
-            saveBtn.querySelector('span').textContent = 'Save';
-        }, 2000);
-    }
-    
     saveBtn.addEventListener('click', saveDocument);
     
     // Keyboard shortcut: Cmd/Ctrl + S
@@ -961,15 +1065,75 @@ const documentTitle = document.title || 'document';
     });
 })();
 
-// Beforeunload prompt - ask to save before closing
-window.addEventListener('beforeunload', (e) => {
-    if (!documentSaved) {
-        e.preventDefault();
-        // Modern browsers show a generic message
-        e.returnValue = 'You have unsaved changes. Save the document before leaving?';
-        return e.returnValue;
+// Exit dialog - show save prompt before closing
+(function() {
+    // Create exit dialog
+    const dialog = document.createElement('div');
+    dialog.id = 'exitDialog';
+    dialog.innerHTML = `
+        <div class="exit-dialog-backdrop"></div>
+        <div class="exit-dialog-content">
+            <h3>Save this document?</h3>
+            <p>This preview will be deleted when you close. Save it to keep a copy.</p>
+            <div class="exit-dialog-buttons">
+                <button class="exit-btn exit-btn-delete" id="exitDelete">Delete</button>
+                <button class="exit-btn exit-btn-save" id="exitSave">Save</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+    
+    let closeAttempted = false;
+    
+    function showExitDialog() {
+        dialog.classList.add('visible');
     }
-});
+    
+    function hideExitDialog() {
+        dialog.classList.remove('visible');
+    }
+    
+    // Handle exit buttons
+    document.getElementById('exitDelete').addEventListener('click', () => {
+        documentSaved = true; // Allow close without prompt
+        hideExitDialog();
+        window.close();
+        // If window.close() doesn't work (not opened by script), just hide dialog
+        // The temp file will be cleaned up by the OS eventually
+    });
+    
+    document.getElementById('exitSave').addEventListener('click', () => {
+        saveDocument();
+        hideExitDialog();
+    });
+    
+    // Close dialog on backdrop click
+    dialog.querySelector('.exit-dialog-backdrop').addEventListener('click', hideExitDialog);
+    
+    // ESC to close dialog
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dialog.classList.contains('visible')) {
+            hideExitDialog();
+        }
+    });
+    
+    // Intercept close attempt
+    window.addEventListener('beforeunload', (e) => {
+        if (!documentSaved) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
+    
+    // Show our custom dialog on visibility change (tab close attempt)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden' && !documentSaved && !closeAttempted) {
+            closeAttempted = true;
+            // Can't show dialog when hidden, but beforeunload will catch it
+        }
+    });
+})();
 
 // Theme toggle functionality
 (function() {
