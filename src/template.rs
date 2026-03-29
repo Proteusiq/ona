@@ -19,31 +19,43 @@ pub fn generate_html(content: &str, title: &str, theme: &str) -> String {
     </style>
 </head>
 <body>
-    <div class="theme-toggle" role="group" aria-label="Theme selection">
-        <button class="theme-btn" data-theme="light" aria-label="Light theme" title="Light">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-        </button>
-        <button class="theme-btn" data-theme="auto" aria-label="Auto theme" title="Auto">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 2a10 10 0 0 0 0 20"></path>
-            </svg>
-        </button>
-        <button class="theme-btn" data-theme="dark" aria-label="Dark theme" title="Dark">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        </button>
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <button class="toolbar-btn save-btn" id="saveBtn" aria-label="Save HTML" title="Save HTML">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Save</span>
+            </button>
+        </div>
+        <div class="theme-toggle" role="group" aria-label="Theme selection">
+            <button class="theme-btn" data-theme="light" aria-label="Light theme" title="Light">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <button class="theme-btn" data-theme="auto" aria-label="Auto theme" title="Auto">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a10 10 0 0 0 0 20"></path>
+                </svg>
+            </button>
+            <button class="theme-btn" data-theme="dark" aria-label="Dark theme" title="Dark">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
     </div>
     <article class="markdown-body">
 {content}
@@ -699,11 +711,62 @@ body {
     margin-bottom: 0.5em;
 }
 
-/* Theme Toggle */
-.theme-toggle {
+/* Toolbar */
+.toolbar {
     position: fixed;
     top: 20px;
     right: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 1000;
+}
+
+.toolbar-left {
+    display: flex;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--color-shadow-medium);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+}
+
+.toolbar-btn:hover {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text);
+    border-color: var(--color-text-tertiary);
+}
+
+.toolbar-btn:active {
+    transform: scale(0.97);
+}
+
+.toolbar-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.save-btn.saved {
+    background-color: #238636;
+    border-color: #238636;
+    color: white;
+}
+
+/* Theme Toggle */
+.theme-toggle {
     display: flex;
     gap: 4px;
     padding: 4px;
@@ -711,7 +774,6 @@ body {
     border: 1px solid var(--color-border);
     border-radius: 10px;
     box-shadow: 0 2px 8px var(--color-shadow-medium);
-    z-index: 1000;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -750,9 +812,19 @@ body {
 }
 
 @media (max-width: 768px) {
-    .theme-toggle {
+    .toolbar {
         top: 12px;
         right: 12px;
+        gap: 8px;
+    }
+    
+    .toolbar-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .toolbar-btn span {
+        display: none;
     }
     
     .theme-btn {
@@ -789,7 +861,7 @@ body {
         color: black;
     }
     
-    .theme-toggle {
+    .toolbar {
         display: none;
     }
     
@@ -847,6 +919,58 @@ body {
 "##;
 
 const JS: &str = r##"
+// Document state
+let documentSaved = false;
+const documentTitle = document.title || 'document';
+
+// Save functionality
+(function() {
+    const saveBtn = document.getElementById('saveBtn');
+    
+    function saveDocument() {
+        const html = document.documentElement.outerHTML;
+        const blob = new Blob(['<!DOCTYPE html>\n' + html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = documentTitle + '.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Mark as saved
+        documentSaved = true;
+        saveBtn.classList.add('saved');
+        saveBtn.querySelector('span').textContent = 'Saved';
+        
+        setTimeout(() => {
+            saveBtn.classList.remove('saved');
+            saveBtn.querySelector('span').textContent = 'Save';
+        }, 2000);
+    }
+    
+    saveBtn.addEventListener('click', saveDocument);
+    
+    // Keyboard shortcut: Cmd/Ctrl + S
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+            e.preventDefault();
+            saveDocument();
+        }
+    });
+})();
+
+// Beforeunload prompt - ask to save before closing
+window.addEventListener('beforeunload', (e) => {
+    if (!documentSaved) {
+        e.preventDefault();
+        // Modern browsers show a generic message
+        e.returnValue = 'You have unsaved changes. Save the document before leaving?';
+        return e.returnValue;
+    }
+});
+
 // Theme toggle functionality
 (function() {
     const html = document.documentElement;
