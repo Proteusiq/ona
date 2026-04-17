@@ -13,17 +13,42 @@ A fast, elegant CLI tool that transforms Markdown into beautiful HTML and opens 
 
 ## Installation
 
+### Homebrew (macOS & Linux)
+
+```bash
+brew install proteusiq/tap/ona
+```
+
+### Shell installer (macOS & Linux)
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Proteusiq/ona/releases/latest/download/ona-installer.sh | sh
+```
+
+### PowerShell installer (Windows)
+
+```powershell
+powershell -c "irm https://github.com/Proteusiq/ona/releases/latest/download/ona-installer.ps1 | iex"
+```
+
+### Cargo (any platform with a Rust toolchain)
+
+```bash
+cargo install --locked ona
+```
+
 ### From source
 
 ```bash
+git clone https://github.com/Proteusiq/ona.git
+cd ona
 cargo install --path .
 ```
 
-### From crates.io (coming soon)
+### Manual download
 
-```bash
-cargo install ona
-```
+Prebuilt binaries for macOS, Linux (glibc & musl), and Windows are attached to
+every [GitHub Release](https://github.com/Proteusiq/ona/releases).
 
 ## Usage
 

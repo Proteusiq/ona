@@ -1,13 +1,21 @@
 [package]
 name = "ona"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Prayson Wilfred Daniel <praysonpi@gmail.com>"]
 description = "A beautiful markdown to HTML renderer that opens in your browser"
 license = "MIT"
+homepage = "https://github.com/Proteusiq/ona"
 repository = "https://github.com/Proteusiq/ona"
+readme = "README.md"
 keywords = ["markdown", "html", "cli", "viewer", "browser"]
 categories = ["command-line-utilities", "text-processing"]
+
+[package.metadata.wix]
+upgrade-guid = "3F25DFC4-079F-4BC0-A7AD-CCCD34E00337"
+path-guid = "C79FC46F-9E15-4BE0-A68F-943F86B555EE"
+license = false
+eula = false
 
 [dependencies]
 clap = { version = "4.5", features = ["derive", "cargo"] }
@@ -24,3 +32,8 @@ lto = true
 codegen-units = 1
 strip = true
 panic = "abort"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

@@ -1,0 +1,34 @@
+[workspace]
+members = ["cargo:."]
+
+# Config for 'dist' — https://opensource.axo.dev/cargo-dist/
+[dist]
+# The preferred dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.31.0"
+# CI backends to support
+ci = "github"
+# Installers generated for each app
+#   shell      → curl | sh   (macOS/Linux)
+#   powershell → irm | iex   (Windows)
+#   homebrew   → Formula written to the tap repo below
+#   msi        → Windows installer
+installers = ["shell", "powershell", "homebrew", "msi"]
+# Homebrew tap repo. Must be created manually on GitHub as `<owner>/homebrew-tap`.
+tap = "Proteusiq/homebrew-tap"
+# Jobs that run during the publish phase of the release workflow.
+publish-jobs = ["homebrew"]
+# Target platforms to build (Rust target-triple syntax).
+# The musl targets produce statically-linked Linux binaries that run on any distro.
+targets = [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+    "x86_64-pc-windows-msvc",
+]
+# Where installers should drop the binary on the user's system
+install-path = "CARGO_HOME"
+# Don't ship the `dist`-generated updater alongside the binary
+install-updater = false
